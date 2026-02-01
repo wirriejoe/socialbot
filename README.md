@@ -17,6 +17,8 @@ export GEMINI_API_KEY=...
 
 Claude Code/Claude Desktop handles chat authentication; no Anthropic API keys are required for MCP usage.
 
+For macOS users, you can store the key securely in Keychain using the MCP tool `configure_gemini_key`.
+
 ## Usage
 
 - Install the plugin from your private marketplace.

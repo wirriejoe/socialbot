@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 
@@ -13,6 +14,7 @@ from ig_researcher.agent.tools.fetch import fetch_and_analyze_posts
 from ig_researcher.agent.tools.search import search_instagram
 from ig_researcher.browser.session import PersistentBrowserSession, SessionManager
 from ig_researcher.config import get_settings
+from ig_researcher.keychain import load_gemini_key, store_gemini_key
 from ig_researcher.logging_utils import get_logger
 
 logger = get_logger(__name__)
@@ -76,12 +78,46 @@ async def _ensure_gemini(ctx: Context | None) -> dict | None:
     settings = get_settings()
     if settings.gemini_api_key:
         return None
+    try:
+        keychain_key = load_gemini_key()
+    except Exception:
+        keychain_key = None
+
+    if keychain_key:
+        os.environ["GEMINI_API_KEY"] = keychain_key
+        settings.gemini_api_key = keychain_key
+        if ctx:
+            await ctx.info("Loaded Gemini API key from Keychain.")
+        return None
     if ctx:
         await ctx.info("Gemini API key missing. Set GEMINI_API_KEY and retry.")
     return {
         "error": "Gemini API key not configured",
         "message": "Set GEMINI_API_KEY in your environment and retry.",
     }
+
+
+@mcp.tool(name="configure_gemini_key")
+async def mcp_configure_gemini_key(
+    api_key: str,
+    ctx: Context | None = None,
+) -> dict:
+    """Store the Gemini API key in macOS Keychain."""
+    try:
+        store_gemini_key(api_key)
+    except Exception as exc:
+        if ctx:
+            await ctx.info(f"Failed to store Gemini key: {exc}")
+        return {
+            "error": "Failed to store Gemini API key",
+            "message": str(exc),
+        }
+    os.environ["GEMINI_API_KEY"] = api_key
+    settings = get_settings()
+    settings.gemini_api_key = api_key
+    if ctx:
+        await ctx.info("Gemini API key stored in Keychain.")
+    return {"ok": True}
 
 
 @mcp.tool(name="search_instagram")

@@ -35,6 +35,7 @@ Tool usage
 - Prefer the wrapper tool: `research_socials`.
 - Use MCP tools directly when you need multiple searches: `search_instagram`, `fetch_and_analyze`.
 - If auth is required, sign in via the browser window and retry.
+- For secure setup on macOS, store the key via `configure_gemini_key` once.
 
 Output requirements
 - Always include verification links (Instagram URLs) for each recommendation.

@@ -2,8 +2,12 @@
 
 from pathlib import Path
 
+from dotenv import find_dotenv, load_dotenv
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# Load .env file before Settings class is instantiated
+load_dotenv(find_dotenv(), override=True)
 
 
 class Settings(BaseSettings):
@@ -12,6 +16,8 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_prefix="",
         extra="ignore",
+        env_file=".env",
+        env_file_encoding="utf-8",
     )
 
     # Other API Keys
