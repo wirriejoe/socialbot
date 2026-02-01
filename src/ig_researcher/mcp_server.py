@@ -74,6 +74,30 @@ async def _ensure_browser(app_ctx: AppContext, ctx: Context | None) -> None:
             await ctx.info("Browser ready.")
 
 
+def _requires_user_action(payload: dict) -> bool:
+    return bool(
+        payload.get("auth_required")
+        or payload.get("challenge_required")
+        or payload.get("error") in {"Not authenticated", "Challenge required"}
+    )
+
+
+async def _maybe_close_browser(
+    app_ctx: AppContext,
+    ctx: Context | None,
+    close_browser: bool,
+    keep_open_reason: str | None = None,
+) -> None:
+    if not close_browser:
+        return
+    if keep_open_reason and ctx:
+        await ctx.info(f"Keeping browser open: {keep_open_reason}")
+        return
+    if ctx:
+        await ctx.info("Closing browser.")
+    await app_ctx.persistent_session.close()
+
+
 async def _ensure_gemini(ctx: Context | None) -> dict | None:
     settings = get_settings()
     if settings.gemini_api_key:
@@ -125,6 +149,7 @@ async def mcp_search_instagram(
     query: str,
     limit: int = 20,
     content_type: str = "all",
+    close_browser: bool = True,
     ctx: Context | None = None,
 ) -> dict:
     """Search Instagram for posts/reels matching a query."""
@@ -142,6 +167,14 @@ async def mcp_search_instagram(
     payload = _parse_tool_payload(result)
     if ctx:
         await ctx.info(f"Search complete. Found {payload.get('count', 0)} results.")
+    await _maybe_close_browser(
+        app_ctx,
+        ctx,
+        close_browser,
+        keep_open_reason="login or challenge required"
+        if _requires_user_action(payload)
+        else None,
+    )
     return payload
 
 
@@ -182,6 +215,7 @@ async def mcp_research_socials(
     limit_per_query: int | None = None,
     content_type: str = "all",
     analysis_focus: str = "general insights",
+    close_browser: bool = True,
     ctx: Context | None = None,
 ) -> dict:
     """Run a full Instagram research workflow (multi-search → reduce → fetch+analyze)."""
@@ -215,6 +249,7 @@ async def mcp_research_socials(
     search_payloads: list[dict] = []
     aggregated_results: list[dict] = []
     search_errors: list[dict] = []
+    user_action_required = False
 
     for q in query_list:
         if ctx:
@@ -229,6 +264,8 @@ async def mcp_research_socials(
 
         if payload.get("error") or payload.get("challenge_required"):
             search_errors.append({"query": q, "error": payload})
+            if _requires_user_action(payload):
+                user_action_required = True
             continue
 
         results = payload.get("results", []) or []
@@ -243,7 +280,7 @@ async def mcp_research_socials(
             )
 
     if not aggregated_results:
-        return {
+        result = {
             "stage": "search",
             "queries": query_list,
             "limit": limit,
@@ -253,6 +290,15 @@ async def mcp_research_socials(
             "errors": search_errors,
             "message": "No results found.",
         }
+        await _maybe_close_browser(
+            app_ctx,
+            ctx,
+            close_browser,
+            keep_open_reason="login or challenge required"
+            if user_action_required
+            else None,
+        )
+        return result
 
     seen: dict[str, dict] = {}
     deduped: list[dict] = []
@@ -278,7 +324,7 @@ async def mcp_research_socials(
 
     shortcodes = [item.get("shortcode") for item in deduped if item.get("shortcode")]
     if not shortcodes:
-        return {
+        result = {
             "stage": "search",
             "queries": query_list,
             "limit": limit,
@@ -288,12 +334,21 @@ async def mcp_research_socials(
             "errors": search_errors,
             "message": "No results found.",
         }
+        await _maybe_close_browser(
+            app_ctx,
+            ctx,
+            close_browser,
+            keep_open_reason="login or challenge required"
+            if user_action_required
+            else None,
+        )
+        return result
 
     if ctx:
         await ctx.info(f"Fetching + analyzing {len(shortcodes)} posts")
     gemini_error = await _ensure_gemini(ctx)
     if gemini_error:
-        return {
+        result = {
             "stage": "analysis",
             "queries": query_list,
             "limit": limit,
@@ -305,6 +360,15 @@ async def mcp_research_socials(
             "deduped": deduped,
             "analysis": gemini_error,
         }
+        await _maybe_close_browser(
+            app_ctx,
+            ctx,
+            close_browser,
+            keep_open_reason="login or challenge required"
+            if user_action_required
+            else None,
+        )
+        return result
 
     analysis_result = await fetch_and_analyze_posts(
         {"shortcodes": shortcodes, "analysis_focus": analysis_focus},
@@ -312,7 +376,7 @@ async def mcp_research_socials(
     )
     analysis_payload = _parse_tool_payload(analysis_result)
 
-    return {
+    result = {
         "stage": "complete",
         "queries": query_list,
         "limit": limit,
@@ -324,6 +388,15 @@ async def mcp_research_socials(
         "deduped": deduped,
         "analysis": analysis_payload,
     }
+    await _maybe_close_browser(
+        app_ctx,
+        ctx,
+        close_browser,
+        keep_open_reason="login or challenge required"
+        if user_action_required
+        else None,
+    )
+    return result
 
 
 def main() -> None:

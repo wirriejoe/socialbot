@@ -36,6 +36,7 @@ Tool usage
 - Use MCP tools directly when you need multiple searches: `search_instagram`, `fetch_and_analyze`.
 - If auth is required, sign in via the browser window and retry.
 - For secure setup on macOS, store the key via `configure_gemini_key` once.
+- By default the browser closes after each search/research run. Pass `close_browser=false` to keep it open.
 
 Output requirements
 - Always include verification links (Instagram URLs) for each recommendation.

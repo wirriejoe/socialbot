@@ -26,6 +26,9 @@ Use this agent when the user needs Instagram-based research or wants to verify i
 - Key insights/themes with evidence
 - Gaps/uncertainties and next steps
 
+## Browser behavior
+- The browser closes after each run by default; set `close_browser=false` when you need it to remain open.
+
 ## When to invoke
 - Travel/food/activity research where IG content is the primary source.
 - Trend discovery and creator consensus checks.
