@@ -1,0 +1,31 @@
+[project]
+name = "ig-researcher"
+version = "0.1.0"
+description = "Instagram research MCP server for Claude Code and Claude Desktop"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    # AI
+    "litellm>=1.40.0",
+    "mcp>=1.12.0",
+    # Browser automation
+    "camoufox>=0.4.0",
+    "playwright>=1.40.0",
+    # Instagram
+    "instaloader>=4.10.0",
+    # Config/Storage
+    "pydantic>=2.5.0",
+    "pydantic-settings>=2.1.0",
+    "cryptography>=41.0.0",
+    # HTTP
+    "httpx>=0.27.0",
+    "browser-cookie3>=0.20.1",
+    "python-dotenv>=1.2.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ig_researcher"]

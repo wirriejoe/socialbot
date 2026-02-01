@@ -1,0 +1,18 @@
+{
+  "name": "socialbot-private",
+  "owner": {
+    "name": "Willie Zhou"
+  },
+  "metadata": {
+    "description": "Private plugin marketplace for socialbot",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "ig-researcher",
+      "source": ".",
+      "description": "Instagram research agent (headful browser + analysis)",
+      "version": "0.1.0"
+    }
+  ]
+}

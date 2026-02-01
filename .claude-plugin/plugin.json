@@ -1,0 +1,11 @@
+{
+  "name": "ig-researcher",
+  "version": "0.1.0",
+  "description": "Headful Instagram research agent (search, fetch, analyze) with Claude Agent SDK.",
+  "author": {
+    "name": "Willie Zhou"
+  },
+  "skills": "./skills",
+  "agents": "./agents",
+  "mcpServers": "./.mcp.json"
+}
