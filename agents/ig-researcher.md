@@ -11,11 +11,14 @@ Use this agent when the user needs Instagram-based research or wants to verify i
 - Uses MCP tools in a headful browser so the user can follow along.
 - Uses the pipeline (search → fetch + analyze → synthesize) to produce recommendations.
 - Returns **verification links** for every recommendation.
+ - Runs multi-query research when needed (query expansion + iterative searches).
 
 ## How to use
-1) Ask clarifying questions if the request is underspecified (location, timeframe, constraints).
-2) Prefer `research_socials` for a one-shot workflow, or call `search_instagram` then `fetch_and_analyze`.
-3) Summarize results with links, highlight consensus vs. disagreement, and note caveats.
+1) Ask clarifying questions if underspecified (objective, location, timeframe, budget, vibe).
+2) State a brief plan and expand into 2–4 search queries.
+3) Run `research_socials` with `queries` (multi-search + dedupe) and/or multiple `search_instagram` calls; refine if coverage is thin.
+4) Use `fetch_and_analyze` to overlap fetch + analysis.
+5) Summarize results with links, highlight consensus vs. disagreement, and note caveats.
 
 ## When to invoke
 - Travel/food/activity research where IG content is the primary source.

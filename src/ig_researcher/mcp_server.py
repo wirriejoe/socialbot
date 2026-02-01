@@ -6,12 +6,10 @@ import asyncio
 import json
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
-from typing import Any
 
 from mcp.server.fastmcp import Context, FastMCP
 
-from ig_researcher.agent.tools.analyze import analyze_videos
-from ig_researcher.agent.tools.fetch import fetch_and_analyze_posts, fetch_posts
+from ig_researcher.agent.tools.fetch import fetch_and_analyze_posts
 from ig_researcher.agent.tools.search import search_instagram
 from ig_researcher.browser.session import PersistentBrowserSession, SessionManager
 from ig_researcher.config import get_settings
@@ -111,22 +109,6 @@ async def mcp_search_instagram(
     return payload
 
 
-@mcp.tool(name="fetch_posts")
-async def mcp_fetch_posts(
-    shortcodes: list[str],
-    ctx: Context | None = None,
-) -> dict:
-    """Fetch detailed metadata for Instagram posts/reels by shortcode."""
-    app_ctx: AppContext = ctx.request_context.lifespan_context  # type: ignore[assignment]
-    if ctx:
-        await ctx.info(f"Fetching {len(shortcodes)} posts")
-    result = await fetch_posts({"shortcodes": shortcodes}, app_ctx.session_manager)
-    payload = _parse_tool_payload(result)
-    if ctx:
-        await ctx.info(f"Fetch complete. Retrieved {payload.get('fetched', 0)} posts.")
-    return payload
-
-
 @mcp.tool(name="fetch_and_analyze")
 async def mcp_fetch_and_analyze(
     shortcodes: list[str],
@@ -156,72 +138,115 @@ async def mcp_fetch_and_analyze(
     return payload
 
 
-@mcp.tool(name="analyze_videos")
-async def mcp_analyze_videos(
-    videos: list[dict[str, Any]],
-    analysis_focus: str = "general insights",
-    ctx: Context | None = None,
-) -> dict:
-    """Analyze videos with Gemini (vision)."""
-    if ctx:
-        await ctx.info(f"Analyzing {len(videos)} videos (focus: {analysis_focus})")
-    gemini_error = await _ensure_gemini(ctx)
-    if gemini_error:
-        return gemini_error
-    result = await analyze_videos(
-        {
-            "videos": videos,
-            "analysis_focus": analysis_focus,
-        }
-    )
-    payload = _parse_tool_payload(result)
-    if ctx:
-        await ctx.info(
-            f"Analysis complete. Analyzed {payload.get('analyzed', 0)} videos."
-        )
-    return payload
-
-
 @mcp.tool(name="research_socials")
 async def mcp_research_socials(
-    query: str,
+    query: str | None = None,
+    queries: list[str] | None = None,
     limit: int = 20,
+    limit_per_query: int | None = None,
     content_type: str = "all",
     analysis_focus: str = "general insights",
     ctx: Context | None = None,
 ) -> dict:
-    """Run a full Instagram research workflow (search → fetch+analyze)."""
+    """Run a full Instagram research workflow (multi-search → reduce → fetch+analyze)."""
     app_ctx: AppContext = ctx.request_context.lifespan_context  # type: ignore[assignment]
     await _ensure_browser(app_ctx, ctx)
 
-    if ctx:
-        await ctx.info(f"Researching Instagram for '{query}' (limit={limit})")
+    query_list: list[str] = []
+    if queries:
+        query_list.extend([q for q in queries if q])
+    if query and query not in query_list:
+        query_list.insert(0, query)
 
-    search_result = await search_instagram(
-        {"query": query, "limit": limit, "content_type": content_type},
-        app_ctx.session_manager,
-        app_ctx.persistent_session,
-    )
-    search_payload = _parse_tool_payload(search_result)
-
-    if search_payload.get("error") or search_payload.get("challenge_required"):
+    if not query_list:
         return {
             "stage": "search",
-            "query": query,
-            "limit": limit,
-            "content_type": content_type,
-            "search": search_payload,
+            "error": "Missing query",
+            "message": "Provide `query` or `queries` to start research.",
         }
 
-    results = search_payload.get("results", []) or []
-    shortcodes = [item.get("shortcode") for item in results if item.get("shortcode")]
+    if limit_per_query is None:
+        limit_per_query = limit
+
+    if ctx:
+        await ctx.info(
+            f"Researching Instagram for {len(query_list)} query(s) (limit={limit})"
+        )
+
+    search_payloads: list[dict] = []
+    aggregated_results: list[dict] = []
+    search_errors: list[dict] = []
+
+    for q in query_list:
+        if ctx:
+            await ctx.info(f"Searching '{q}' (limit={limit_per_query})")
+        search_result = await search_instagram(
+            {"query": q, "limit": limit_per_query, "content_type": content_type},
+            app_ctx.session_manager,
+            app_ctx.persistent_session,
+        )
+        payload = _parse_tool_payload(search_result)
+        search_payloads.append({"query": q, "payload": payload})
+
+        if payload.get("error") or payload.get("challenge_required"):
+            search_errors.append({"query": q, "error": payload})
+            continue
+
+        results = payload.get("results", []) or []
+        for item in results:
+            aggregated_results.append(
+                {
+                    "shortcode": item.get("shortcode"),
+                    "type": item.get("type"),
+                    "url": item.get("url"),
+                    "query": q,
+                }
+            )
+
+    if not aggregated_results:
+        return {
+            "stage": "search",
+            "queries": query_list,
+            "limit": limit,
+            "limit_per_query": limit_per_query,
+            "content_type": content_type,
+            "searches": search_payloads,
+            "errors": search_errors,
+            "message": "No results found.",
+        }
+
+    seen: dict[str, dict] = {}
+    deduped: list[dict] = []
+    for item in aggregated_results:
+        code = item.get("shortcode")
+        if not code:
+            continue
+        if code not in seen:
+            entry = {
+                "shortcode": code,
+                "type": item.get("type"),
+                "url": item.get("url"),
+                "queries": [item.get("query")],
+            }
+            seen[code] = entry
+            deduped.append(entry)
+        else:
+            if item.get("query") not in seen[code]["queries"]:
+                seen[code]["queries"].append(item.get("query"))
+
+    if limit:
+        deduped = deduped[:limit]
+
+    shortcodes = [item.get("shortcode") for item in deduped if item.get("shortcode")]
     if not shortcodes:
         return {
             "stage": "search",
-            "query": query,
+            "queries": query_list,
             "limit": limit,
+            "limit_per_query": limit_per_query,
             "content_type": content_type,
-            "search": search_payload,
+            "searches": search_payloads,
+            "errors": search_errors,
             "message": "No results found.",
         }
 
@@ -231,11 +256,14 @@ async def mcp_research_socials(
     if gemini_error:
         return {
             "stage": "analysis",
-            "query": query,
+            "queries": query_list,
             "limit": limit,
+            "limit_per_query": limit_per_query,
             "content_type": content_type,
             "analysis_focus": analysis_focus,
-            "search": search_payload,
+            "searches": search_payloads,
+            "errors": search_errors,
+            "deduped": deduped,
             "analysis": gemini_error,
         }
 
@@ -247,11 +275,14 @@ async def mcp_research_socials(
 
     return {
         "stage": "complete",
-        "query": query,
+        "queries": query_list,
         "limit": limit,
+        "limit_per_query": limit_per_query,
         "content_type": content_type,
         "analysis_focus": analysis_focus,
-        "search": search_payload,
+        "searches": search_payloads,
+        "errors": search_errors,
+        "deduped": deduped,
         "analysis": analysis_payload,
     }
 

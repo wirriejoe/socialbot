@@ -20,4 +20,4 @@ Claude Code/Claude Desktop handles chat authentication; no Anthropic API keys ar
 ## Usage
 
 - Install the plugin from your private marketplace.
-- Use the MCP tool `research_socials` (or call `search_instagram` + `fetch_and_analyze`).
+- Use the MCP tool `research_socials` (multi-search + dedupe) or call `search_instagram` + `fetch_and_analyze`.
