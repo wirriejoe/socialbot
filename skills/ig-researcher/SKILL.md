@@ -38,7 +38,11 @@ Tool usage
 
 Output requirements
 - Always include verification links (Instagram URLs) for each recommendation.
-- Summarize in concise bullets; avoid generic filler.
+- Provide a structured report:
+  - Research plan (1–3 bullets)
+  - Shortlist recommendations with links + 1-line rationale
+  - Key insights/themes with evidence
+  - Gaps/uncertainties and next steps (if any)
 - Cite the MCP tool outputs as your source of truth.
 
 Notes

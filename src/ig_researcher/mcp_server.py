@@ -168,6 +168,9 @@ async def mcp_research_socials(
     if limit_per_query is None:
         limit_per_query = limit
 
+    if analysis_focus == "general insights" and query_list:
+        analysis_focus = query_list[0]
+
     if ctx:
         await ctx.info(
             f"Researching Instagram for {len(query_list)} query(s) (limit={limit})"

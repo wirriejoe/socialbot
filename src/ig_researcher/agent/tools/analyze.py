@@ -22,7 +22,7 @@ logger = get_logger(__name__)
 # Tool definition for Claude API
 ANALYZE_VIDEOS_TOOL = {
     "name": "analyze_videos",
-    "description": """Analyze video content using Gemini vision AI. Takes video URLs and returns detailed analysis including topics discussed, key points, visual elements, and sentiment. Use this after fetching video metadata to understand the content.""",
+    "description": """Analyze video content using Gemini vision AI. Takes video URLs and returns a research-focused summary aligned to the user's query. Use this after fetching video metadata to understand the content without watching the video.""",
     "input_schema": {
         "type": "object",
         "properties": {
@@ -41,7 +41,7 @@ ANALYZE_VIDEOS_TOOL = {
             },
             "analysis_focus": {
                 "type": "string",
-                "description": "What to focus the analysis on (e.g., 'tips and advice', 'product reviews', 'tutorials')",
+                "description": "Research objective or query to focus the analysis on",
                 "default": "general insights",
             },
         },
@@ -221,24 +221,30 @@ async def _analyze_single_video(
                         },
                         {
                             "type": "text",
-                            "text": f"""Analyze this Instagram video with focus on: {focus}
+                            "text": f"""You are analyzing an Instagram video to help answer a user research query.
 
+Research objective: {focus}
 Caption: {caption}
 
-Provide a structured analysis including:
-1. Main topic/theme (1-2 sentences)
-2. Key points or tips mentioned (bullet list, max 5)
-3. Tone and style (educational, entertaining, promotional, etc.)
-4. Target audience
-5. Credibility indicators (expertise shown, sources cited, etc.)
-6. Notable visual elements or production quality
+Extract only information that helps the research objective. The user should NOT need to watch the video. Provide quotes from the video where relevant.
 
-Be concise but comprehensive. Return as JSON.""",
+Return JSON with:
+- relevance (0-100)
+- summary (2-4 sentences, objective-focused)
+- key_takeaways (bullet list, max 5)
+- venue_or_topic (name(s) or topic extracted, if any)
+- group_or_use_case_fit (if relevant, why/why not)
+- price_or_budget_signals (if any)
+- booking_or_logistics (hours, reservations, location cues, etc.)
+- evidence (short phrases tied to what is seen/heard)
+
+If the video is off-topic, set relevance <= 30 and explain why in summary.""",
                         },
                     ],
                 }
             ],
             max_tokens=1000,
+            response_format={"type": "json_object"},
         )
         logger.info(
             "tool.analyze: gemini completed shortcode=%s time=%.2fs",
@@ -258,34 +264,34 @@ Be concise but comprehensive. Return as JSON.""",
 
 async def _synthesize_insights(analyses: list[dict], focus: str) -> dict:
     """Synthesize patterns across all analyzed videos."""
-    settings = get_settings()
 
     all_analyses = "\n\n---\n\n".join(
         [f"Video {a['shortcode']}:\n{a['analysis']['raw_analysis']}" for a in analyses]
     )
 
     response = await litellm.acompletion(
-        model=settings.gemini_model,
+        model="gemini/gemini-3-pro-preview",
         messages=[
             {
                 "role": "user",
-                "content": f"""Synthesize insights from these {len(analyses)} Instagram video analyses.
-Focus area: {focus}
+                "content": f"""Synthesize a research report from these {len(analyses)} Instagram video analyses.
+Research objective: {focus}
 
 Individual Analyses:
 {all_analyses}
 
-Provide:
-1. Top 3-5 recurring themes/insights (with frequency count)
-2. Common recommendations or tips across videos
-3. Points of disagreement or different approaches
-4. Overall quality/credibility assessment of the content
-5. Gaps - what topics were NOT covered that might be expected
+Return a concise report with:
+1. Executive summary (3-6 bullets)
+2. Shortlist of best candidates (max 8) with 1-line reason each
+3. Key insights/themes (with counts)
+4. Notable disagreements or tradeoffs
+5. Evidence gaps / uncertainties
+6. Return quotes and evidence from the videos where relevant.
+7. Return links to the videos where relevant.
 
-Format as actionable insights for someone researching this topic.""",
+Make it decision-ready so the user does not need to watch the videos.""",
             }
         ],
-        max_tokens=2000,
     )
 
     return {

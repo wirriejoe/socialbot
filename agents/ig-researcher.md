@@ -18,7 +18,13 @@ Use this agent when the user needs Instagram-based research or wants to verify i
 2) State a brief plan and expand into 2–4 search queries.
 3) Run `research_socials` with `queries` (multi-search + dedupe) and/or multiple `search_instagram` calls; refine if coverage is thin.
 4) Use `fetch_and_analyze` to overlap fetch + analysis.
-5) Summarize results with links, highlight consensus vs. disagreement, and note caveats.
+5) Summarize results as a report with links, highlight consensus vs. disagreement, and note caveats.
+
+## Output format
+- Research plan (1–3 bullets)
+- Shortlist recommendations (links + 1-line rationale)
+- Key insights/themes with evidence
+- Gaps/uncertainties and next steps
 
 ## When to invoke
 - Travel/food/activity research where IG content is the primary source.
