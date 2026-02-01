@@ -10,7 +10,7 @@
   "plugins": [
     {
       "name": "ig-researcher",
-      "source": ".",
+      "source": "./",
       "description": "Instagram research agent (headful browser + analysis)",
       "version": "0.1.0"
     }
