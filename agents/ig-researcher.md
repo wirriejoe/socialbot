@@ -25,6 +25,7 @@ Use this agent when the user needs Instagram-based research or wants to verify i
 - Shortlist recommendations (links + 1-line rationale, plus a Sources line with IG URLs)
 - Key insights/themes with evidence
 - Gaps/uncertainties and next steps
+ - If the MCP response is large, look for `result_path` to open the full payload on disk.
 
 ## Browser behavior
 - The browser closes after each run by default; set `close_browser=false` when you need it to remain open.

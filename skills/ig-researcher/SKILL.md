@@ -40,6 +40,7 @@ Tool usage
 - For secure setup on macOS, store the key via `configure_gemini_key` once.
 - By default the browser closes after each search/research run. Pass `close_browser=false` to keep it open.
 - Use `analysis_limit` in `research_socials` to analyze a subset while preserving full context in `deduped_all`.
+- If results are large, use `persist_results=true` (and optionally `persist_path`) so the full payload is written to disk and the MCP response stays compact. The tool also auto-compacts very large payloads and returns `result_path`.
 
 Output requirements
 - Always include verification links (Instagram URLs) for each recommendation.

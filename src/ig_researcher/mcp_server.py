@@ -5,6 +5,8 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+from datetime import datetime
+from pathlib import Path
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 
@@ -61,6 +63,83 @@ def _parse_tool_payload(result: dict) -> dict:
         return json.loads(raw)
     except json.JSONDecodeError:
         return {"error": "Invalid tool response", "raw": raw}
+
+
+def _summarize_searches(search_payloads: list[dict]) -> list[dict]:
+    summary: list[dict] = []
+    for entry in search_payloads:
+        payload = entry.get("payload", {}) or {}
+        summary.append(
+            {
+                "query": entry.get("query"),
+                "count": payload.get("count"),
+                "requested_limit": payload.get("requested_limit"),
+                "exhausted": payload.get("exhausted"),
+                "error": payload.get("error"),
+                "auth_required": payload.get("auth_required"),
+                "challenge_required": payload.get("challenge_required"),
+            }
+        )
+    return summary
+
+
+def _summarize_analysis(analysis_payload: dict) -> dict:
+    analyses = analysis_payload.get("analyses", []) or []
+    analyzed_shortcodes = [
+        item.get("shortcode")
+        for item in analyses
+        if isinstance(item, dict) and item.get("shortcode")
+    ]
+    return {
+        "fetched": analysis_payload.get("fetched"),
+        "analyzed": analysis_payload.get("analyzed"),
+        "analysis_failed": analysis_payload.get("analysis_failed"),
+        "analyzed_shortcodes": analyzed_shortcodes,
+        "synthesis": analysis_payload.get("synthesis"),
+        "error": analysis_payload.get("error"),
+        "message": analysis_payload.get("message"),
+    }
+
+
+def _compact_result(result: dict) -> dict:
+    compact: dict = {}
+    for key in (
+        "stage",
+        "queries",
+        "limit",
+        "limit_per_query",
+        "analysis_limit",
+        "content_type",
+        "analysis_focus",
+        "total_deduped",
+        "analysis_truncated",
+        "deduped",
+        "errors",
+        "message",
+        "result_path",
+        "result_bytes",
+        "result_saved",
+    ):
+        if key in result:
+            compact[key] = result[key]
+    if "searches" in result:
+        compact["search_summary"] = _summarize_searches(result.get("searches", []))
+    if "analysis" in result and isinstance(result.get("analysis"), dict):
+        compact["analysis_summary"] = _summarize_analysis(result["analysis"])
+    return compact
+
+
+def _persist_result(result: dict, persist_path: str | None) -> tuple[str, int]:
+    settings = get_settings()
+    if persist_path:
+        path = Path(persist_path).expanduser()
+    else:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        path = settings.cache_dir / f"research_{timestamp}.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = json.dumps(result, ensure_ascii=True, indent=2)
+    path.write_text(payload, encoding="utf-8")
+    return str(path), len(payload)
 
 
 async def _ensure_browser(app_ctx: AppContext, ctx: Context | None) -> None:
@@ -216,6 +295,10 @@ async def mcp_research_socials(
     analysis_limit: int | None = None,
     content_type: str = "all",
     analysis_focus: str = "general insights",
+    return_compact: bool = False,
+    persist_results: bool = False,
+    persist_path: str | None = None,
+    max_payload_chars: int = 20000,
     close_browser: bool = True,
     ctx: Context | None = None,
 ) -> dict:
@@ -234,11 +317,17 @@ async def mcp_research_socials(
         query_list.insert(0, query)
 
     if not query_list:
-        return {
+        result = {
             "stage": "search",
             "error": "Missing query",
             "message": "Provide `query` or `queries` to start research.",
         }
+        if persist_results:
+            result_path, result_bytes = _persist_result(result, persist_path)
+            result["result_path"] = result_path
+            result["result_bytes"] = result_bytes
+            result["result_saved"] = True
+        return result
 
     if limit_per_query is None:
         limit_per_query = limit
@@ -293,6 +382,7 @@ async def mcp_research_socials(
             "queries": query_list,
             "limit": limit,
             "limit_per_query": limit_per_query,
+            "analysis_limit": analysis_limit,
             "content_type": content_type,
             "searches": search_payloads,
             "errors": search_errors,
@@ -306,7 +396,20 @@ async def mcp_research_socials(
             if user_action_required
             else None,
         )
-        return result
+        if persist_results:
+            result_path, result_bytes = _persist_result(result, persist_path)
+            result["result_path"] = result_path
+            result["result_bytes"] = result_bytes
+            result["result_saved"] = True
+        payload = json.dumps(result, ensure_ascii=True)
+        if len(payload) > max_payload_chars:
+            if not result.get("result_saved"):
+                result_path, result_bytes = _persist_result(result, persist_path)
+                result["result_path"] = result_path
+                result["result_bytes"] = result_bytes
+                result["result_saved"] = True
+            return _compact_result(result)
+        return _compact_result(result) if return_compact else result
 
     seen: dict[str, dict] = {}
     deduped: list[dict] = []
@@ -340,6 +443,7 @@ async def mcp_research_socials(
             "queries": query_list,
             "limit": limit,
             "limit_per_query": limit_per_query,
+            "analysis_limit": analysis_limit,
             "content_type": content_type,
             "searches": search_payloads,
             "errors": search_errors,
@@ -353,7 +457,20 @@ async def mcp_research_socials(
             if user_action_required
             else None,
         )
-        return result
+        if persist_results:
+            result_path, result_bytes = _persist_result(result, persist_path)
+            result["result_path"] = result_path
+            result["result_bytes"] = result_bytes
+            result["result_saved"] = True
+        payload = json.dumps(result, ensure_ascii=True)
+        if len(payload) > max_payload_chars:
+            if not result.get("result_saved"):
+                result_path, result_bytes = _persist_result(result, persist_path)
+                result["result_path"] = result_path
+                result["result_bytes"] = result_bytes
+                result["result_saved"] = True
+            return _compact_result(result)
+        return _compact_result(result) if return_compact else result
 
     if ctx:
         await ctx.info(f"Fetching + analyzing {len(shortcodes)} posts")
@@ -383,7 +500,20 @@ async def mcp_research_socials(
             if user_action_required
             else None,
         )
-        return result
+        if persist_results:
+            result_path, result_bytes = _persist_result(result, persist_path)
+            result["result_path"] = result_path
+            result["result_bytes"] = result_bytes
+            result["result_saved"] = True
+        payload = json.dumps(result, ensure_ascii=True)
+        if len(payload) > max_payload_chars:
+            if not result.get("result_saved"):
+                result_path, result_bytes = _persist_result(result, persist_path)
+                result["result_path"] = result_path
+                result["result_bytes"] = result_bytes
+                result["result_saved"] = True
+            return _compact_result(result)
+        return _compact_result(result) if return_compact else result
 
     analysis_result = await fetch_and_analyze_posts(
         {"shortcodes": shortcodes, "analysis_focus": analysis_focus},
@@ -415,7 +545,20 @@ async def mcp_research_socials(
         if user_action_required
         else None,
     )
-    return result
+    if persist_results:
+        result_path, result_bytes = _persist_result(result, persist_path)
+        result["result_path"] = result_path
+        result["result_bytes"] = result_bytes
+        result["result_saved"] = True
+    payload = json.dumps(result, ensure_ascii=True)
+    if len(payload) > max_payload_chars:
+        if not result.get("result_saved"):
+            result_path, result_bytes = _persist_result(result, persist_path)
+            result["result_path"] = result_path
+            result["result_bytes"] = result_bytes
+            result["result_saved"] = True
+        return _compact_result(result)
+    return _compact_result(result) if return_compact else result
 
 
 def main() -> None:
