@@ -24,7 +24,7 @@ Research workflow
 3) Run multiple searches; refine until coverage is deep.
    - Use `research_socials` with `queries` for multi-search + dedupe.
    - Aim for 40–80 unique results across queries when possible.
-   - If the user didn't specify a limit, default to `limit_per_query` 30–40 and `analysis_limit` ~40.
+   - If the user didn't specify a limit, default to `limit_per_query` 30-40 and `limit` 60-100.
    - If results are weak, run additional `search_instagram` calls with new queries.
 4) Fetch + analyze while you research.
    - Use `fetch_and_analyze` to overlap fetch and analysis.
@@ -39,7 +39,7 @@ Tool usage
 - If auth is required, sign in via the browser window and retry.
 - For secure setup on macOS, store the key via `configure_gemini_key` once.
 - By default the browser closes after each search/research run. Pass `close_browser=false` to keep it open.
-- Use `analysis_limit` in `research_socials` to analyze a subset while preserving full context in `deduped_all`.
+- Use `limit` in `research_socials` to control both results and analysis; full context is still preserved in `deduped_all`.
 - If results are large, use `persist_results=true` (and optionally `persist_path`) so the full payload is written to disk and the MCP response stays compact. The tool also auto-compacts very large payloads and returns `result_path`.
 
 Output requirements
