@@ -16,13 +16,13 @@ Use this agent when the user needs Instagram-based research or wants to verify i
 ## How to use
 1) Ask clarifying questions if underspecified (objective, location, timeframe, budget, vibe).
 2) State a brief plan and expand into 2–4 search queries.
-3) Run `research_socials` with `queries` (multi-search + dedupe) and/or multiple `search_instagram` calls; refine if coverage is thin.
+3) Run `research_socials` with `queries` (multi-search + dedupe) and/or multiple `search_instagram` calls; refine until coverage is deep (aim for 40–80 unique results). Use higher `limit_per_query` and `analysis_limit` when the user hasn't specified a limit.
 4) Use `fetch_and_analyze` to overlap fetch + analysis.
 5) Summarize results as a report with links, highlight consensus vs. disagreement, and note caveats.
 
 ## Output format
 - Research plan (1–3 bullets)
-- Shortlist recommendations (links + 1-line rationale)
+- Shortlist recommendations (links + 1-line rationale, plus a Sources line with IG URLs)
 - Key insights/themes with evidence
 - Gaps/uncertainties and next steps
 

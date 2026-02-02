@@ -252,8 +252,17 @@ If the video is off-topic, set relevance <= 30 and explain why in summary.""",
             time.monotonic() - infer_start,
         )
 
+        raw = response.choices[0].message.content
+        parsed = None
+        try:
+            if raw:
+                parsed = json.loads(raw)
+        except json.JSONDecodeError:
+            parsed = {"raw": raw}
+
         return {
-            "raw_analysis": response.choices[0].message.content,
+            "raw_analysis": raw,
+            "parsed": parsed,
             "caption": caption,
         }
 
@@ -264,13 +273,25 @@ If the video is off-topic, set relevance <= 30 and explain why in summary.""",
 
 async def _synthesize_insights(analyses: list[dict], focus: str) -> dict:
     """Synthesize patterns across all analyzed videos."""
+    settings = get_settings()
 
-    all_analyses = "\n\n---\n\n".join(
-        [f"Video {a['shortcode']}:\n{a['analysis']['raw_analysis']}" for a in analyses]
-    )
+    formatted = []
+    for entry in analyses:
+        analysis = entry.get("analysis", {})
+        formatted.append(
+            json.dumps(
+                {
+                    "shortcode": entry.get("shortcode"),
+                    "url": entry.get("url"),
+                    "caption": analysis.get("caption"),
+                    "analysis": analysis.get("parsed") or analysis.get("raw_analysis"),
+                }
+            )
+        )
+    all_analyses = "\n\n---\n\n".join(formatted)
 
     response = await litellm.acompletion(
-        model="gemini/gemini-3-pro-preview",
+        model=settings.gemini_model,
         messages=[
             {
                 "role": "user",
@@ -280,21 +301,29 @@ Research objective: {focus}
 Individual Analyses:
 {all_analyses}
 
-Return a concise report with:
-1. Executive summary (3-6 bullets)
-2. Shortlist of best candidates (max 8) with 1-line reason each
-3. Key insights/themes (with counts)
-4. Notable disagreements or tradeoffs
-5. Evidence gaps / uncertainties
-6. Return quotes and evidence from the videos where relevant.
-7. Return links to the videos where relevant.
+Return JSON with:
+- executive_summary (3-6 bullets)
+- recommendations (max 8). Each item: name, rationale, source_shortcodes, source_urls
+- key_insights (list with theme, count, evidence_shortcodes, evidence_urls)
+- tradeoffs (list)
+- gaps (list)
+- evidence_quotes (list of short quotes with source_shortcodes)
 
 Make it decision-ready so the user does not need to watch the videos.""",
             }
         ],
+        response_format={"type": "json_object"},
     )
 
+    raw = response.choices[0].message.content
+    parsed = None
+    try:
+        if raw:
+            parsed = json.loads(raw)
+    except json.JSONDecodeError:
+        parsed = None
+
     return {
-        "synthesis": response.choices[0].message.content,
+        "synthesis": parsed or {"raw": raw},
         "video_count": len(analyses),
     }

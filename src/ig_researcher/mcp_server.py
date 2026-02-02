@@ -213,12 +213,17 @@ async def mcp_research_socials(
     queries: list[str] | None = None,
     limit: int = 20,
     limit_per_query: int | None = None,
+    analysis_limit: int | None = None,
     content_type: str = "all",
     analysis_focus: str = "general insights",
     close_browser: bool = True,
     ctx: Context | None = None,
 ) -> dict:
-    """Run a full Instagram research workflow (multi-search → reduce → fetch+analyze)."""
+    """Run a full Instagram research workflow (multi-search → reduce → fetch+analyze).
+
+    Use `analysis_limit` to cap how many deduped results are analyzed while preserving
+    the full deduped list in the output.
+    """
     app_ctx: AppContext = ctx.request_context.lifespan_context  # type: ignore[assignment]
     await _ensure_browser(app_ctx, ctx)
 
@@ -237,6 +242,9 @@ async def mcp_research_socials(
 
     if limit_per_query is None:
         limit_per_query = limit
+
+    if analysis_limit is None:
+        analysis_limit = limit
 
     if analysis_focus == "general insights" and query_list:
         analysis_focus = query_list[0]
@@ -319,8 +327,11 @@ async def mcp_research_socials(
             if item.get("query") not in seen[code]["queries"]:
                 seen[code]["queries"].append(item.get("query"))
 
-    if limit:
-        deduped = deduped[:limit]
+    deduped_all = deduped
+    if analysis_limit:
+        deduped = deduped_all[:analysis_limit]
+    else:
+        deduped = deduped_all
 
     shortcodes = [item.get("shortcode") for item in deduped if item.get("shortcode")]
     if not shortcodes:
@@ -353,11 +364,15 @@ async def mcp_research_socials(
             "queries": query_list,
             "limit": limit,
             "limit_per_query": limit_per_query,
+            "analysis_limit": analysis_limit,
             "content_type": content_type,
             "analysis_focus": analysis_focus,
             "searches": search_payloads,
             "errors": search_errors,
             "deduped": deduped,
+            "deduped_all": deduped_all,
+            "total_deduped": len(deduped_all),
+            "analysis_truncated": len(deduped_all) > len(deduped),
             "analysis": gemini_error,
         }
         await _maybe_close_browser(
@@ -381,11 +396,15 @@ async def mcp_research_socials(
         "queries": query_list,
         "limit": limit,
         "limit_per_query": limit_per_query,
+        "analysis_limit": analysis_limit,
         "content_type": content_type,
         "analysis_focus": analysis_focus,
         "searches": search_payloads,
         "errors": search_errors,
         "deduped": deduped,
+        "deduped_all": deduped_all,
+        "total_deduped": len(deduped_all),
+        "analysis_truncated": len(deduped_all) > len(deduped),
         "analysis": analysis_payload,
     }
     await _maybe_close_browser(

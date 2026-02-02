@@ -20,9 +20,11 @@ Research workflow
    - Always confirm objective, location, timeframe, budget/constraints, and preferred vibe.
    - Ask for group size, dietary needs, or content type when relevant.
 2) Briefly state a plan (1–3 steps) and expand the search intent.
-   - Draft 2–4 alternate queries (synonyms, nearby landmarks, venue types, local terms).
-3) Run one or more searches; refine if coverage is thin.
+   - Draft 4–8 alternate queries (synonyms, nearby landmarks, venue types, local terms).
+3) Run multiple searches; refine until coverage is deep.
    - Use `research_socials` with `queries` for multi-search + dedupe.
+   - Aim for 40–80 unique results across queries when possible.
+   - If the user didn't specify a limit, default to `limit_per_query` 30–40 and `analysis_limit` ~40.
    - If results are weak, run additional `search_instagram` calls with new queries.
 4) Fetch + analyze while you research.
    - Use `fetch_and_analyze` to overlap fetch and analysis.
@@ -37,9 +39,11 @@ Tool usage
 - If auth is required, sign in via the browser window and retry.
 - For secure setup on macOS, store the key via `configure_gemini_key` once.
 - By default the browser closes after each search/research run. Pass `close_browser=false` to keep it open.
+- Use `analysis_limit` in `research_socials` to analyze a subset while preserving full context in `deduped_all`.
 
 Output requirements
 - Always include verification links (Instagram URLs) for each recommendation.
+- For every recommendation, include a **Sources** line with the specific IG links used.
 - Provide a structured report:
   - Research plan (1–3 bullets)
   - Shortlist recommendations with links + 1-line rationale
