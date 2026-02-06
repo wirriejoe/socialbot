@@ -21,6 +21,7 @@ dependencies = [
     "httpx>=0.27.0",
     "browser-cookie3>=0.20.1",
     "python-dotenv>=1.2.1",
+    "weasyprint>=68.0",
 ]
 
 [build-system]

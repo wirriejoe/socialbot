@@ -7,5 +7,5 @@
   },
   "skills": "./skills/ig-researcher/SKILL.md",
   "agents": "./agents/ig-researcher.md",
-  "mcpServers": "./.mcp.json"
+  "mcpServers": "./.plugin.mcp.json"
 }

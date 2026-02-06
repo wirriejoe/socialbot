@@ -1,16 +1,18 @@
 {
-  "ig-researcher": {
-    "type": "stdio",
-    "command": "uv",
-    "args": [
-      "run",
-      "--project",
-      "${CLAUDE_PLUGIN_ROOT}",
-      "-m",
-      "ig_researcher.mcp_server"
-    ],
-    "env": {
-      "PYTHONPATH": "${CLAUDE_PLUGIN_ROOT}/src"
+  "mcpServers": {
+    "ig-researcher": {
+      "type": "stdio",
+      "command": "uv",
+      "args": [
+        "run",
+        "--project",
+        ".",
+        "-m",
+        "ig_researcher.mcp_server"
+      ],
+      "env": {
+        "PYTHONPATH": "./src"
+      }
     }
   }
 }

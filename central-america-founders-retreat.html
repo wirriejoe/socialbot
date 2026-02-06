@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Central America Founders Retreat Itinerary</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a4d2e;
+            --secondary: #f5ebe0;
+            --accent: #c7a17a;
+            --text: #2d3436;
+            --text-light: #636e72;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text);
+            line-height: 1.7;
+            background: var(--white);
+        }
+
+        /* Cover Page */
+        .cover {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary) 0%, #2d5a3d 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px;
+            position: relative;
+            overflow: hidden;
+            page-break-after: always;
+        }
+
+        .cover::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        .cover-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .cover h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 4rem;
+            color: var(--white);
+            margin-bottom: 20px;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .cover .subtitle {
+            font-size: 1.4rem;
+            color: var(--accent);
+            font-weight: 300;
+            margin-bottom: 40px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .cover .tagline {
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.8);
+            max-width: 500px;
+            margin: 0 auto 60px;
+        }
+
+        .cover-stats {
+            display: flex;
+            gap: 60px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            color: var(--accent);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.7);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 80px 60px;
+        }
+
+        h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--accent);
+        }
+
+        h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin: 40px 0 20px;
+        }
+
+        h4 {
+            font-size: 1.1rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 30px 0 15px;
+            font-weight: 600;
+        }
+
+        p {
+            margin-bottom: 20px;
+            color: var(--text-light);
+        }
+
+        /* Executive Summary */
+        .exec-summary {
+            background: var(--secondary);
+            padding: 40px;
+            border-radius: 8px;
+            margin-bottom: 50px;
+        }
+
+        .exec-summary h2 {
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 20px;
+        }
+
+        .key-finding {
+            background: var(--primary);
+            color: var(--white);
+            padding: 25px 30px;
+            border-radius: 6px;
+            margin-top: 25px;
+        }
+
+        .key-finding strong {
+            color: var(--accent);
+        }
+
+        /* Route */
+        .route {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            padding: 40px;
+            background: linear-gradient(135deg, var(--primary) 0%, #2d5a3d 100%);
+            border-radius: 8px;
+            margin: 40px 0;
+        }
+
+        .route-country {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            color: var(--white);
+        }
+
+        .route-arrow {
+            color: var(--accent);
+            font-size: 1.5rem;
+        }
+
+        /* Day Cards */
+        .day-card {
+            background: var(--white);
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 40px;
+            margin: 30px 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        .day-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .day-number {
+            background: var(--primary);
+            color: var(--white);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .day-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            color: var(--primary);
+        }
+
+        .day-location {
+            color: var(--accent);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+        }
+
+        th {
+            background: var(--primary);
+            color: var(--white);
+            padding: 15px 20px;
+            text-align: left;
+            font-weight: 500;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            color: var(--text-light);
+        }
+
+        tr:nth-child(even) {
+            background: var(--secondary);
+        }
+
+        td a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        td a:hover {
+            color: var(--accent);
+        }
+
+        /* Activity Lists */
+        .activity-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .activity-list li {
+            padding: 12px 0 12px 35px;
+            position: relative;
+            color: var(--text-light);
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .activity-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Highlight Box */
+        .highlight-box {
+            background: linear-gradient(135deg, var(--secondary) 0%, #fff 100%);
+            border-left: 4px solid var(--accent);
+            padding: 25px 30px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .highlight-box strong {
+            color: var(--primary);
+        }
+
+        /* Section Divider */
+        .section-divider {
+            text-align: center;
+            margin: 60px 0;
+            position: relative;
+        }
+
+        .section-divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e0e0e0;
+        }
+
+        .section-divider span {
+            background: var(--white);
+            padding: 0 30px;
+            position: relative;
+            color: var(--accent);
+            font-size: 1.5rem;
+        }
+
+        /* Programming Section */
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 0;
+            margin: 25px 0;
+        }
+
+        .schedule-time {
+            background: var(--primary);
+            color: var(--white);
+            padding: 20px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+
+        .schedule-activity {
+            background: var(--secondary);
+            padding: 20px;
+            color: var(--text);
+        }
+
+        /* Budget Grid */
+        .budget-table th:first-child {
+            border-radius: 8px 0 0 0;
+        }
+
+        .budget-table th:last-child {
+            border-radius: 0 8px 0 0;
+        }
+
+        /* Ranking List */
+        .ranking-list {
+            list-style: none;
+            padding: 0;
+            counter-reset: ranking;
+        }
+
+        .ranking-list li {
+            padding: 20px 20px 20px 70px;
+            position: relative;
+            background: var(--secondary);
+            margin: 10px 0;
+            border-radius: 8px;
+            counter-increment: ranking;
+        }
+
+        .ranking-list li::before {
+            content: counter(ranking);
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 35px;
+            height: 35px;
+            background: var(--primary);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Logistics Grid */
+        .logistics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .logistics-item {
+            background: var(--secondary);
+            padding: 25px;
+            border-radius: 8px;
+        }
+
+        .logistics-item h5 {
+            color: var(--primary);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .logistics-item p {
+            margin: 0;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--primary);
+            color: var(--white);
+            padding: 40px 60px;
+            margin-top: 80px;
+        }
+
+        .footer h4 {
+            color: var(--accent);
+            margin-bottom: 20px;
+        }
+
+        .footer p {
+            color: rgba(255,255,255,0.8);
+            font-size: 0.9rem;
+        }
+
+        /* Page Breaks */
+        .page-break {
+            page-break-before: always;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .cover {
+                min-height: 100vh;
+            }
+
+            .container {
+                padding: 40px;
+            }
+        }
+
+        /* Option Badge */
+        .option-badge {
+            display: inline-block;
+            background: var(--accent);
+            color: var(--white);
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        /* Week Header */
+        .week-header {
+            background: linear-gradient(135deg, var(--secondary) 0%, #fff 100%);
+            padding: 30px 40px;
+            border-radius: 8px;
+            margin: 40px 0 30px;
+            text-align: center;
+        }
+
+        .week-header h3 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Cover Page -->
+    <div class="cover">
+        <div class="cover-content">
+            <h1>Central America<br>Founders Retreat</h1>
+            <p class="subtitle">Itinerary & Planning Guide</p>
+            <p class="tagline">A curated journey through Guatemala, El Salvador, Nicaragua, and Costa Rica designed for startup founders seeking transformation, connection, and adventure.</p>
+
+            <div class="cover-stats">
+                <div class="stat">
+                    <span class="stat-number">700+</span>
+                    <span class="stat-label">Posts Analyzed</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">4</span>
+                    <span class="stat-label">Countries</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">1-2</span>
+                    <span class="stat-label">Weeks</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Executive Summary -->
+    <div class="container">
+        <div class="exec-summary">
+            <h2>Executive Summary</h2>
+            <p>This report synthesizes research from <strong>700+ Instagram posts</strong> across founders retreats, entrepreneur travel, and Central America destinations to create a comprehensive itinerary for a transformational founders retreat.</p>
+
+            <div class="key-finding">
+                <strong>Key Finding:</strong> Guatemala (Lake Atitlan) + Costa Rica combination offers the optimal balance of affordability, transformational experiences, and adventure activities for founder retreats.
+            </div>
+        </div>
+
+        <h2>Recommended Route</h2>
+        <div class="route">
+            <span class="route-country">Guatemala</span>
+            <span class="route-arrow">→</span>
+            <span class="route-country">El Salvador</span>
+            <span class="route-arrow">→</span>
+            <span class="route-country">Nicaragua</span>
+            <span class="route-arrow">→</span>
+            <span class="route-country">Costa Rica</span>
+        </div>
+
+        <div class="section-divider"><span>✦</span></div>
+
+        <!-- Option A -->
+        <span class="option-badge">Option A</span>
+        <h2>1-Week Intensive</h2>
+
+        <div class="day-card">
+            <div class="day-header">
+                <div class="day-number">1-3</div>
+                <div>
+                    <div class="day-title">Lake Atitlan, Guatemala</div>
+                    <div class="day-location">San Marcos La Laguna or Santa Cruz</div>
+                </div>
+            </div>
+
+            <h4>Accommodations</h4>
+            <table>
+                <tr>
+                    <th>Venue</th>
+                    <th>Description</th>
+                    <th>Source</th>
+                </tr>
+                <tr>
+                    <td><strong>Eagles Nest Atitlan</strong></td>
+                    <td>Retreat venue with volcano views, yoga decks, wellness programming</td>
+                    <td><a href="https://www.instagram.com/p/DFq4tBtuCAv/">View</a></td>
+                </tr>
+                <tr>
+                    <td><strong>Casa Prana Atitlan</strong></td>
+                    <td>Boutique retreat on the shores, peaceful energy</td>
+                    <td><a href="https://www.instagram.com/p/DNd1yM0Rm-q/">View</a></td>
+                </tr>
+                <tr>
+                    <td><strong>Lakeview Lodge</strong></td>
+                    <td>Luxury Airbnb with sunrise volcano views</td>
+                    <td><a href="https://www.instagram.com/p/DGhbWwCuI0E/">View</a></td>
+                </tr>
+                <tr>
+                    <td><strong>La Casa del Mundo</strong></td>
+                    <td>Iconic lakefront hotel (1M+ views)</td>
+                    <td><a href="https://www.instagram.com/p/DE91AKzRrH_/">View</a></td>
+                </tr>
+            </table>
+
+            <h4>Activities</h4>
+            <ul class="activity-list">
+                <li>Morning yoga/meditation sessions overlooking the lake</li>
+                <li>Founder workshop sessions (strategy, vision, vulnerability exercises)</li>
+                <li>Salsa dancing class - excellent team bonding</li>
+                <li>Kayaking/paddleboarding on the lake</li>
+                <li>Visit Mayan villages (San Juan, Santiago)</li>
+                <li>Sound healing experiences at wellness centers</li>
+            </ul>
+
+            <div class="highlight-box">
+                <strong>Why It Works for Founders:</strong> Peaceful, affordable, strong wellness infrastructure. No cell signal in some villages creates forced digital detox—essential for strategic thinking.
+            </div>
+        </div>
+
+        <div class="day-card">
+            <div class="day-header">
+                <div class="day-number">4-5</div>
+                <div>
+                    <div class="day-title">Antigua & Volcano Acatenango</div>
+                    <div class="day-location">Guatemala Highlands</div>
+                </div>
+            </div>
+
+            <h4>Experience</h4>
+            <ul class="activity-list">
+                <li><strong>Volcano Acatenango overnight hike</strong> — Watch Volcán Fuego erupt at night</li>
+                <li>Colonial town exploration in Antigua</li>
+                <li>Coffee farm tours (team building + caffeine supply)</li>
+            </ul>
+
+            <h4>Accommodations</h4>
+            <ul class="activity-list">
+                <li>Boutique hotels around Antigua's central square</li>
+                <li>El Convento for luxury option</li>
+            </ul>
+
+            <div class="highlight-box">
+                <strong>Why It Works for Founders:</strong> Epic shared challenge creates lasting bonds. The overnight hike through adversity builds trust faster than any workshop. Plus, incredible photo opportunities for team content.
+            </div>
+        </div>
+
+        <div class="day-card">
+            <div class="day-header">
+                <div class="day-number">6-7</div>
+                <div>
+                    <div class="day-title">Arenal / La Fortuna</div>
+                    <div class="day-location">Costa Rica</div>
+                </div>
+            </div>
+
+            <h4>Activities</h4>
+            <ul class="activity-list">
+                <li><strong>Hot springs</strong> — Tabacón or Baldi for recovery and organic networking</li>
+                <li><strong>White water rafting</strong> — highly recommended team activity</li>
+                <li>Zip-lining canopy tours through cloud forest</li>
+                <li>Hanging bridges nature walk</li>
+                <li>Canyoneering/waterfall rappelling</li>
+            </ul>
+
+            <h4>Accommodations</h4>
+            <ul class="activity-list">
+                <li>Nayara Springs (luxury)</li>
+                <li>Arenal Observatory Lodge</li>
+                <li>Tabacón Resort</li>
+            </ul>
+
+            <div class="highlight-box">
+                <strong>Why It Works for Founders:</strong> Adrenaline activities build trust rapidly. Hot springs provide the perfect environment for recovery and deep conversation.
+            </div>
+        </div>
+
+        <div class="page-break"></div>
+
+        <!-- Option B -->
+        <span class="option-badge">Option B</span>
+        <h2>2-Week Comprehensive</h2>
+
+        <div class="week-header">
+            <h3>Week One</h3>
+        </div>
+
+        <div class="day-card">
+            <div class="day-header">
+                <div class="day-number">1-4</div>
+                <div>
+                    <div class="day-title">Guatemala</div>
+                    <div class="day-location">Lake Atitlan + Antigua</div>
+                </div>
+            </div>
+            <p>Same programming as Option A, with an additional day for <strong>Semuc Champey</strong> natural limestone pools if the group is adventurous.</p>
+        </div>
+
+        <div class="day-card">
+            <div class="day-header">
+                <div class="day-number">5-7</div>
+                <div>
+                    <div class="day-title">El Tunco</div>
+                    <div class="day-location">El Salvador</div>
+                </div>
+            </div>
+
+            <h4>Activities</h4>
+            <ul class="activity-list">
+                <li>Laid-back surf town vibes</li>
+                <li><strong>7 Waterfalls Hike</strong> — epic full-day adventure</li>
+                <li>Beach sunset strategy sessions</li>
+                <li>Local pupusa dinners (authentic team bonding)</li>
+                <li>Surf lessons for beginners</li>
+            </ul>
+
+            <div class="highlight-box">
+                <strong>Why It Works:</strong> El Salvador is the hidden gem of Central America. Less touristy, incredibly affordable, and the local food culture creates memorable shared experiences.
+            </div>
+        </div>
+
+        <div class="week-header">
+            <h3>Week Two</h3>
+        </div>
+
+        <div class="day-card">
+            <div class="day-header">
+                <div class="day-number">8-10</div>
+                <div>
+                    <div class="day-title">San Juan del Sur</div>
+                    <div class="day-location">Nicaragua</div>
+                </div>
+            </div>
+
+            <h4>Activities</h4>
+            <ul class="activity-list">
+                <li><strong>Surf retreat</strong> — beginner-friendly waves</li>
+                <li>Catamaran sunset cruise</li>
+                <li><strong>Volcano boarding at Cerro Negro</strong> — unique team challenge</li>
+                <li>Beach club strategy sessions</li>
+            </ul>
+
+            <h4>Accommodations</h4>
+            <ul class="activity-list">
+                <li>Mukul Resort (luxury)</li>
+                <li>Pelican Eyes Resort</li>
+                <li>Surf ranch villas</li>
+            </ul>
+        </div>
+
+        <div class="day-card">
+            <div class="day-header">
+                <div class="day-number">11-14</div>
+                <div>
+                    <div class="day-title">Nosara or Santa Teresa</div>
+                    <div class="day-location">Costa Rica</div>
+                </div>
+            </div>
+
+            <h4>Activities</h4>
+            <ul class="activity-list">
+                <li>Wellness retreat programming</li>
+                <li>Daily yoga with world-class instructors</li>
+                <li>Surfing</li>
+                <li><strong>Blue Zone exploration</strong> — longevity and wellness insights</li>
+                <li>Final reflection and future planning sessions</li>
+                <li>Co-working spaces available for catch-up work</li>
+            </ul>
+
+            <h4>Accommodations</h4>
+            <ul class="activity-list">
+                <li>Nosara boutique retreats</li>
+                <li>Harmony Hotel</li>
+                <li>The Gilded Iguana</li>
+            </ul>
+
+            <div class="highlight-box">
+                <strong>Perfect Ending:</strong> Nosara's combination of world-class wellness, beautiful beaches, and entrepreneurial community makes it the ideal place to close the retreat with intention-setting for the future.
+            </div>
+        </div>
+
+        <div class="page-break"></div>
+
+        <h2>Programming Elements</h2>
+        <p>Based on successful founder retreats including <a href="https://www.instagram.com/p/DTRYZ3njUHp/">@flyingwithfounders</a>:</p>
+
+        <h3>Daily Structure</h3>
+        <div class="schedule-grid">
+            <div class="schedule-time">Morning</div>
+            <div class="schedule-activity">Yoga/movement + healthy breakfast</div>
+            <div class="schedule-time">Mid-Morning</div>
+            <div class="schedule-activity">Workshop content (strategy, fundraising, personal growth)</div>
+            <div class="schedule-time">Afternoon</div>
+            <div class="schedule-activity">Adventure activity or free exploration</div>
+            <div class="schedule-time">Evening</div>
+            <div class="schedule-activity">Group dinner + facilitated conversation or free time</div>
+        </div>
+
+        <h3>Workshop Topics That Work</h3>
+        <ul class="activity-list">
+            <li>Vulnerability and authentic leadership</li>
+            <li>Vision casting and goal setting</li>
+            <li>Healthy founder habits / burnout prevention</li>
+            <li>Mastermind sessions (problem-solving circles)</li>
+            <li>Exit planning / "healthy exits"</li>
+        </ul>
+
+        <h3>Team Building Activities</h3>
+        <p>Ranked by impact based on social research:</p>
+        <ol class="ranking-list">
+            <li><strong>Volcano overnight hike (Acatenango)</strong> — highest transformational impact</li>
+            <li><strong>White water rafting</strong> — requires teamwork and communication</li>
+            <li><strong>Surf lessons</strong> — shared failure and learning builds bonds</li>
+            <li><strong>Salsa/dance class</strong> — pushes everyone outside comfort zones</li>
+            <li><strong>Hot springs</strong> — natural environment for deep conversation</li>
+        </ol>
+
+        <div class="section-divider"><span>✦</span></div>
+
+        <h2>Budget Considerations</h2>
+        <table class="budget-table">
+            <tr>
+                <th>Country</th>
+                <th>Budget</th>
+                <th>Mid-Range</th>
+                <th>Luxury</th>
+            </tr>
+            <tr>
+                <td><strong>Guatemala</strong></td>
+                <td>$50-80/night</td>
+                <td>$100-200/night</td>
+                <td>$250+/night</td>
+            </tr>
+            <tr>
+                <td><strong>El Salvador</strong></td>
+                <td>$40-70/night</td>
+                <td>$80-150/night</td>
+                <td>$200+/night</td>
+            </tr>
+            <tr>
+                <td><strong>Nicaragua</strong></td>
+                <td>$50-100/night</td>
+                <td>$120-250/night</td>
+                <td>$400+/night</td>
+            </tr>
+            <tr>
+                <td><strong>Costa Rica</strong></td>
+                <td>$80-120/night</td>
+                <td>$150-300/night</td>
+                <td>$500+/night</td>
+            </tr>
+        </table>
+
+        <div class="highlight-box">
+            <strong>Pro Tip:</strong> Guatemala is notably "very affordable" and "less touristy" per multiple sources. Starting here maximizes budget for the Costa Rica finale.
+        </div>
+
+        <div class="page-break"></div>
+
+        <h2>Logistics</h2>
+        <div class="logistics-grid">
+            <div class="logistics-item">
+                <h5>Flights In</h5>
+                <p>Guatemala City (GUA)</p>
+            </div>
+            <div class="logistics-item">
+                <h5>Flights Out</h5>
+                <p>San José (SJO) or Liberia (LIR), Costa Rica</p>
+            </div>
+            <div class="logistics-item">
+                <h5>Internal Transport</h5>
+                <p>Private drivers recommended for groups (arrange through hotels)</p>
+            </div>
+            <div class="logistics-item">
+                <h5>Best Time to Visit</h5>
+                <p>November – April (dry season)</p>
+            </div>
+            <div class="logistics-item">
+                <h5>Ideal Group Size</h5>
+                <p>8-15 founders for intimacy + diverse perspectives</p>
+            </div>
+            <div class="logistics-item">
+                <h5>Visa Requirements</h5>
+                <p>US/EU passport holders: No visa required for any country</p>
+            </div>
+        </div>
+
+        <div class="section-divider"><span>✦</span></div>
+
+        <h2>Instagram Sources</h2>
+        <p>For further inspiration and research:</p>
+        <table>
+            <tr>
+                <th>Account</th>
+                <th>Focus</th>
+                <th>Link</th>
+            </tr>
+            <tr>
+                <td><strong>@flyingwithfounders</strong></td>
+                <td>Founder retreats</td>
+                <td><a href="https://www.instagram.com/p/DTRYZ3njUHp/">View Post</a></td>
+            </tr>
+            <tr>
+                <td><strong>@alexandrablodgett</strong></td>
+                <td>Luxury Central America</td>
+                <td><a href="https://www.instagram.com/p/C7ViR_lt6ov/">View Post</a></td>
+            </tr>
+            <tr>
+                <td><strong>@thefoundersclub</strong></td>
+                <td>Retreat programming</td>
+                <td><a href="https://www.instagram.com/p/DGyT0aJJ7Dt/">View Post</a></td>
+            </tr>
+            <tr>
+                <td><strong>@rianneandclay</strong></td>
+                <td>Central America travel</td>
+                <td><a href="https://www.instagram.com/p/DMVqX7hstYN/">View Post</a></td>
+            </tr>
+            <tr>
+                <td><strong>@runtheworldsummit</strong></td>
+                <td>Female founders retreats</td>
+                <td><a href="https://www.instagram.com/p/DO7CNA5kW8f/">View Post</a></td>
+            </tr>
+            <tr>
+                <td><strong>@casapranaatitlan</strong></td>
+                <td>Lake Atitlan boutique retreat</td>
+                <td><a href="https://www.instagram.com/p/DNd1yM0Rm-q/">View Post</a></td>
+            </tr>
+        </table>
+
+    </div>
+
+    <div class="footer">
+        <h4>Research Methodology</h4>
+        <p>This report was compiled from Instagram research conducted on February 2, 2026, analyzing <strong>700+ unique posts</strong> across 22 search queries covering founders retreats, entrepreneur travel, and Central America destinations.</p>
+        <br>
+        <p><strong>Recommendation:</strong> Start with Guatemala (Lake Atitlan + Acatenango) for the first half—it offers the best cost-effectiveness with the highest transformational factor. Finish in Costa Rica (Nosara or Arenal) for polish and adventure activities.</p>
+    </div>
+
+</body>
+</html>
